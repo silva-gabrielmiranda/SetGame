@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct Oval: Shape{
-    
     func path(in rect: CGRect) -> Path {
         //let center = CGPoint(x: rect.midX, y: rect.midY)
         let radius = CGFloat((rect.maxX * 0.2) / 2)
@@ -56,6 +55,4 @@ struct Oval: Shape{
         
         return p
     }
-    
-    
 }

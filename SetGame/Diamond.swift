@@ -9,9 +9,6 @@
 import SwiftUI
 
 struct Diamond: Shape{
-    
-
-    
     func path(in rect: CGRect) -> Path {
         
         let distance = rect.maxX * 0.2
@@ -50,6 +47,4 @@ struct Diamond: Shape{
         
         return p
     }
-    
-    
 }

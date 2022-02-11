@@ -9,12 +9,6 @@
 import SwiftUI
 
 struct Squiggle: Shape{
-    
-    let firstAngle = Angle(degrees: 0-90)
-    let secondAngle = Angle(degrees: 90-90)
-    let thirdAngle = Angle(degrees: 180-90)
-    let fourthAngle = Angle(degrees: 270-90)
-    
     func path(in rect: CGRect) -> Path {
 
         // MARK: LEFT
