@@ -39,15 +39,14 @@ class ViewModel: ObservableObject{
         model.dealMoreCards()
     }
     
+    var numberOfShowingCards: Int{
+        return model.numberOfShowingCards
+    }
+    
     var cards: Array<Card>{
-        var cards: Array<Card> = []
-        let allCards = model.cards
-        
-        for index in 0..<model.numberOfShowingCards {
-            cards.append(allCards[index])
-        }
-//        cards.append(model.cards.first!)
-        
-        return cards
+        return model.cards
+    }
+    func newGame(){
+        model.newGame()
     }
 }

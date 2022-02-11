@@ -14,15 +14,28 @@ struct ContentView: View {
     var body: some View {
         VStack{
             HStack{
-                Spacer()
-                Text("Deal 3 cards!")
+                Text("New game")
                     .padding()
                     .foregroundColor(.blue)
                     .onTapGesture {
-                        game.dealMoreCards()
+                        game.newGame()
                     }
+                Spacer()
+                if (game.numberOfShowingCards == game.cards.count){
+                    Text("Deck is empty")
+                        .padding()
+                        .foregroundColor(.gray)
+                } else {
+                    Text("Deal 3 cards!")
+                        .padding()
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            game.dealMoreCards()
+                        }
+                }
+                
             }
-            AspectVGrid(items: game.cards, aspectRatio: DrawingConstants.cardsAspectRatio, content: { card in
+            AspectVGrid(items: Array(game.cards[0..<game.numberOfShowingCards]), aspectRatio: DrawingConstants.cardsAspectRatio, content: { card in
                 cardView(for: card)
             })
         }
@@ -50,54 +63,40 @@ struct CardView: View{
     private var shapes: some View{
         VStack{
             ForEach(0..<card.numberOfShapes) { _ in
-                switch(card.shape){
-                case "diamond":
-                    if(card.shading == "open"){
-                        Diamond().stroke(lineWidth: DrawingConstants.lineWidth)
-                    } else if(card.shading == "solid"){
-                        Diamond()
-                    } else {
-                        Diamond().opacity(DrawingConstants.shapeOpacity)
+                switch (card.shape){
+                case .diamond:
+                    switch card.shading {
+                        case .open: Diamond().stroke(lineWidth: DrawingConstants.lineWidth)
+                        case .solid: Diamond()
+                        case .stripped: Diamond().opacity(DrawingConstants.shapeOpacity)
                     }
-                case "squiggle":
-                    if(card.shading == "open"){
-                        Squiggle().stroke(lineWidth: DrawingConstants.lineWidth)
-                    } else if(card.shading == "solid"){
-                        Squiggle()
-                    } else {
-                        Squiggle().opacity(DrawingConstants.shapeOpacity)
+                case .squiggle:
+                    switch card.shading {
+                        case .open: Squiggle().stroke(lineWidth: DrawingConstants.lineWidth)
+                        case .solid: Squiggle()
+                        case .stripped: Squiggle().opacity(DrawingConstants.shapeOpacity)
                     }
-                case "oval":
-                    if(card.shading == "open"){
-                        Oval().stroke(lineWidth: DrawingConstants.lineWidth)
-                    } else if(card.shading == "solid"){
-                        Oval()
-                    } else {
-                        Oval().opacity(DrawingConstants.shapeOpacity)
+                case .oval:
+                    switch card.shading {
+                        case .open: Oval().stroke(lineWidth: DrawingConstants.lineWidth)
+                        case .solid: Oval()
+                        case .stripped: Oval().opacity(DrawingConstants.shapeOpacity)
                     }
-                default:
-                    RoundedRectangle(cornerRadius: DrawingConstants.shapeCornerRadius)
                 }
             }
         }
     }
     
     var body: some View{
-        GeometryReader { geometry in
-            ZStack{
-                let shape = RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius)
-                
-                if(card.status == "notMatched"){
-                    shape.fill().foregroundColor(.red).opacity(DrawingConstants.backgrougOpacity)
-                } else if(card.status == "matched"){
-                    shape.fill().foregroundColor(.green).opacity(DrawingConstants.backgrougOpacity)
-                } else if(card.status == "selected"){
-                    shape.fill().foregroundColor(.blue).opacity(DrawingConstants.backgrougOpacity)
-                } else {
-                    shape.fill().foregroundColor(.gray).opacity(DrawingConstants.backgrougOpacity)
-                }
-                shapes
+        ZStack{
+            let cardBackground = RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius)
+            switch card.status{
+                case .notMatched: cardBackground.fill().foregroundColor(.red).opacity(DrawingConstants.backgrougOpacity)
+                case .matched: cardBackground.fill().foregroundColor(.green).opacity(DrawingConstants.backgrougOpacity)
+                case .selected: cardBackground.fill().foregroundColor(.blue).opacity(DrawingConstants.backgrougOpacity)
+                case .idle: cardBackground.fill().foregroundColor(.gray).opacity(DrawingConstants.backgrougOpacity)
             }
+            shapes
         }
     }
     

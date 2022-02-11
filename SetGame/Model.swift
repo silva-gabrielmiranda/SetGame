@@ -8,31 +8,15 @@
 import Foundation
 import SwiftUI
 
-enum shape{
-    case diamond
-    case squiggle
-    case open
-}
-
 struct Model {
     var cards: Array<Card> = []
     static let numberOfShapesOptions = [1, 2, 3]
-    static let shapeOptions = ["diamond", "squiggle", "oval"]
-    static let shadingOptions = [ "solid", "stripped", "open"]
+    static let shapeOptions = [Card.shape.diamond, Card.shape.oval, Card.shape.squiggle]
+    static let shadingOptions = [ Card.shading.solid, Card.shading.stripped, Card.shading.open]
     static let colorOptions = ["green", "blue", "red"]
     var selectedCards: Array<Card>{
-        
-        var selectedCardsList: Array<Card> = []
-        
-        for cardIndex in cards.indices{
-            if(cards[cardIndex].status == "selected"){
-                selectedCardsList.append(cards[cardIndex])
-            }
-        }
-        
-        return selectedCardsList
+        return cards.filter({$0.status == .selected})
     }
-    
     var numberOfShowingCards: Int = 12
     
     init(){
@@ -41,6 +25,7 @@ struct Model {
     
     mutating func newGame(){
         cards = []
+        numberOfShowingCards = 12
         var id: Int = 0
         for numberOfShapesIndex in Model.numberOfShapesOptions.indices {
             for shapeIndex in Model.shapeOptions.indices {
@@ -63,15 +48,37 @@ struct Model {
         cards = cards.shuffled()
     }
     
+    mutating func clearMatchesAndNoMatches(){
+        for index in cards.indices.reversed(){
+            if(cards[index].status == .notMatched){
+                cards[index].status = .idle
+            }
+            if(cards[index].status == .matched){
+                if(numberOfShowingCards < cards.count && numberOfShowingCards > 0){
+                    cards[index] = cards.last!
+                    if(numberOfShowingCards > cards.count){
+                        numberOfShowingCards -= 1
+                    }
+                    cards.removeLast()
+                } else {
+                    cards.remove(at: index)
+                }
+            }
+        }
+    }
+    
     mutating func chooseCard(_ card: Card){
         print("Choosed Card. Selected cards = \(selectedCards.count)")
+        
+        clearMatchesAndNoMatches()
+        
         var newCard = card
         
-        if((card.status == "idle" || card.status == "notMatched") && selectedCards.count < 3){
-            newCard.status = "selected"
+        if((card.status == .idle || card.status == .notMatched) && selectedCards.count < 3){
+            newCard.status = .selected
         }
-        if(card.status == "selected"){
-            newCard.status = "idle"
+        if(card.status == .selected){
+            newCard.status = .idle
         }
         
         if let chosenIndex = cards.firstIndex(where: {$0.id == card.id}){
@@ -86,6 +93,7 @@ struct Model {
     }
     
     mutating func dealMoreCards(){
+        clearMatchesAndNoMatches()
         if(numberOfShowingCards < cards.count - 3){
             numberOfShowingCards += 3
         } else {
@@ -151,14 +159,14 @@ struct Model {
             print("Valid match")
             
             for cardIndex in cards.indices{
-                if(cards[cardIndex].status == "selected"){
-                    cards[cardIndex].status = "matched"
+                if(cards[cardIndex].status == .selected){
+                    cards[cardIndex].status = .matched
                 }
             }
         } else {
             for cardIndex in cards.indices{
-                if(cards[cardIndex].status == "selected"){
-                    cards[cardIndex].status = "notMatched"
+                if(cards[cardIndex].status == .selected){
+                    cards[cardIndex].status = .notMatched
                 }
             }
         }
@@ -167,10 +175,28 @@ struct Model {
     
     struct Card: Identifiable {
         let numberOfShapes: Int
-        let shape: String
-        let shading: String
+        let shape: shape
+        let shading: shading
         let color: String
-        var status: String = "idle" //notMatched, matched, selected, idle
+        var status: status = .idle //notMatched, matched, selected, idle
         let id: Int
+    
+        enum shape{
+            case diamond
+            case squiggle
+            case oval
+        }
+        enum shading {
+            case solid
+            case stripped
+            case open
+        }
+
+        enum status{
+            case notMatched
+            case idle
+            case matched
+            case selected
+        }
     }
 }
