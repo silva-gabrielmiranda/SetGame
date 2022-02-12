@@ -17,6 +17,7 @@ struct ContentView: View {
                 Text("New game")
                     .padding()
                     .foregroundColor(.blue)
+                    .font(Font.body.weight(.bold))
                     .onTapGesture {
                         game.newGame()
                     }
@@ -24,10 +25,12 @@ struct ContentView: View {
                 if (game.numberOfShowingCards == game.cards.count){
                     Text("Deck is empty")
                         .padding()
+                        .font(Font.body.weight(.bold))
                         .foregroundColor(.gray)
                 } else {
                     Text("Deal 3 cards!")
                         .padding()
+                        .font(Font.body.weight(.bold))
                         .foregroundColor(.blue)
                         .onTapGesture {
                             game.dealMoreCards()
@@ -52,7 +55,7 @@ struct ContentView: View {
     }
     
     private struct DrawingConstants{
-        static let paddingBetweenCards: CGFloat = 1
+        static let paddingBetweenCards: CGFloat = 2
         static let cardsAspectRatio: CGFloat = 2/3
     }
 }
@@ -64,27 +67,27 @@ struct CardView: View{
         VStack{
             ForEach(0..<card.numberOfShapes) { _ in
                 switch (card.shape){
-                case .diamond:
-                    switch card.shading {
-                        case .open: Diamond().stroke(lineWidth: DrawingConstants.lineWidth)
-                        case .solid: Diamond()
-                        case .stripped: Diamond().opacity(DrawingConstants.shapeOpacity)
-                    }
-                case .squiggle:
-                    switch card.shading {
-                        case .open: Squiggle().stroke(lineWidth: DrawingConstants.lineWidth)
-                        case .solid: Squiggle()
-                        case .stripped: Squiggle().opacity(DrawingConstants.shapeOpacity)
-                    }
-                case .oval:
-                    switch card.shading {
-                        case .open: Oval().stroke(lineWidth: DrawingConstants.lineWidth)
-                        case .solid: Oval()
-                        case .stripped: Oval().opacity(DrawingConstants.shapeOpacity)
-                    }
+                    case .diamond:
+                        switch card.shading {
+                            case .open: Diamond().stroke(lineWidth: DrawingConstants.lineWidth)
+                            case .solid: Diamond()
+                            case .stripped: Diamond().opacity(DrawingConstants.shapeOpacity)
+                        }
+                    case .squiggle:
+                        switch card.shading {
+                            case .open: Squiggle().stroke(lineWidth: DrawingConstants.lineWidth)
+                            case .solid: Squiggle()
+                            case .stripped: Squiggle().opacity(DrawingConstants.shapeOpacity)
+                        }
+                    case .oval:
+                        switch card.shading {
+                            case .open: Oval().stroke(lineWidth: DrawingConstants.lineWidth)
+                            case .solid: Oval()
+                            case .stripped: Oval().opacity(DrawingConstants.shapeOpacity)
+                        }
                 }
             }
-        }
+        }.padding(DrawingConstants.shapesPadding)
     }
     
     var body: some View{
@@ -106,6 +109,7 @@ struct CardView: View{
         static let shapeCornerRadius: CGFloat = 200
         static let shapeOpacity: Double = 0.5
         static let lineWidth: CGFloat = 2
+        static let shapesPadding: CGFloat = 1
     }
 }
 
@@ -113,6 +117,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = ViewModel()
         ContentView(game: game)
+            .preferredColorScheme(.dark)
             .previewInterfaceOrientation(.portrait)
     }
 }

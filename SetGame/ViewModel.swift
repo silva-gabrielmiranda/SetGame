@@ -13,22 +13,12 @@ class ViewModel: ObservableObject{
     
     @Published private var model = Model()
     
-    func chooseColor(_ color: String) -> Color {
-        
-        var colorObject: Color = Color.orange
-        
+    func chooseColor(_ color: Card.color) -> Color {
         switch(color){
-        case "red":
-            colorObject = Color.red
-        case "blue":
-            colorObject = Color.blue
-        case "green":
-            colorObject = Color.green
-        default:
-            colorObject = Color.orange
+            case .red: return Color.red
+            case .blue: return Color.blue
+            case .green: return Color.green
         }
-        
-        return colorObject
     }
     
     func chooseCard(_ card: Card){

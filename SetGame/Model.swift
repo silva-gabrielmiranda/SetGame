@@ -13,7 +13,7 @@ struct Model {
     static let numberOfShapesOptions = [1, 2, 3]
     static let shapeOptions = [Card.shape.diamond, Card.shape.oval, Card.shape.squiggle]
     static let shadingOptions = [ Card.shading.solid, Card.shading.stripped, Card.shading.open]
-    static let colorOptions = ["green", "blue", "red"]
+    static let colorOptions = [Card.color.green, Card.color.red, Card.color.blue]
     var selectedCards: Array<Card>{
         return cards.filter({$0.status == .selected})
     }
@@ -26,7 +26,7 @@ struct Model {
     mutating func newGame(){
         cards = []
         numberOfShowingCards = 12
-        var id: Int = 0
+        var id: Int = 1
         for numberOfShapesIndex in Model.numberOfShapesOptions.indices {
             for shapeIndex in Model.shapeOptions.indices {
                 for shadingIndex in Model.shapeOptions.indices {
@@ -46,6 +46,10 @@ struct Model {
             }
         }
         cards = cards.shuffled()
+//        numberOfShowingCards = 3
+//        cards.append(Card(numberOfShapes: 1, shape: Card.shape.squiggle, shading: Card.shading.solid, color: "red", id: 1))
+//        cards.append(Card(numberOfShapes: 2, shape: Card.shape.squiggle, shading: Card.shading.solid, color: "red", id: 2))
+//        cards.append(Card(numberOfShapes: 3, shape: Card.shape.squiggle, shading: Card.shading.solid, color: "red", id: 3))
     }
     
     mutating func clearMatchesAndNoMatches(){
@@ -54,21 +58,18 @@ struct Model {
                 cards[index].status = .idle
             }
             if(cards[index].status == .matched){
-                if(numberOfShowingCards < cards.count && numberOfShowingCards > 0){
-                    cards[index] = cards.last!
-                    if(numberOfShowingCards > cards.count){
-                        numberOfShowingCards -= 1
-                    }
-                    cards.removeLast()
-                } else {
+                if(numberOfShowingCards == cards.count){
+                    numberOfShowingCards -= 1
                     cards.remove(at: index)
+                } else {
+                    cards[index] = cards.removeLast()
                 }
             }
         }
     }
     
     mutating func chooseCard(_ card: Card){
-        print("Choosed Card. Selected cards = \(selectedCards.count)")
+        print("Card selected \(card.id)")
         
         clearMatchesAndNoMatches()
         
@@ -88,8 +89,6 @@ struct Model {
         if(selectedCards.count >= 3){
             validateMatches()
         }
-        
-        //Resetar cards, matched = deleta, notMatched
     }
     
     mutating func dealMoreCards(){
@@ -177,8 +176,8 @@ struct Model {
         let numberOfShapes: Int
         let shape: shape
         let shading: shading
-        let color: String
-        var status: status = .idle //notMatched, matched, selected, idle
+        let color: color
+        var status: status = .idle
         let id: Int
     
         enum shape{
@@ -197,6 +196,11 @@ struct Model {
             case idle
             case matched
             case selected
+        }
+        enum color{
+            case red
+            case green
+            case blue
         }
     }
 }
