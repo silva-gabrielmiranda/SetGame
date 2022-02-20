@@ -36,7 +36,6 @@ struct ContentView: View {
                             game.dealMoreCards()
                         }
                 }
-                
             }
             AspectVGrid(items: Array(game.cards[0..<game.numberOfShowingCards]), aspectRatio: DrawingConstants.cardsAspectRatio, content: { card in
                 cardView(for: card)
