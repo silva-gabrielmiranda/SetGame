@@ -11,60 +11,121 @@ struct ContentView: View {
     
     @ObservedObject var game: ViewModel
     
+    @Namespace private var matchedNamespace
+    
     var body: some View {
         VStack{
-            HStack{
-                Text("New game")
-                    .padding()
-                    .foregroundColor(.blue)
-                    .font(Font.body.weight(.bold))
+            AspectVGrid(items: Array(game.cards[0..<game.numberOfShowingCards]).filter({$0.status != .matched}), aspectRatio: DrawingConstants.cardsAspectRatio, content: { card in
+                cardView(for: card)
+                    .matchedGeometryEffect(id: card.id, in: matchedNamespace)
                     .onTapGesture {
-                        game.newGame()
+                        withAnimation{
+                                game.chooseCard(card)
+                    
+                        }
                     }
+            })
+            
+            HStack{
+                matchedDeck
                 Spacer()
-                if (game.numberOfShowingCards == game.cards.count){
-                    Text("Deck is empty")
-                        .padding()
-                        .font(Font.body.weight(.bold))
-                        .foregroundColor(.gray)
-                } else {
-                    Text("Deal 3 cards!")
-                        .padding()
-                        .font(Font.body.weight(.bold))
-                        .foregroundColor(.blue)
-                        .onTapGesture {
+                newGameButton
+                Spacer()
+                deckBody
+                    .onTapGesture {
+                        withAnimation{
                             game.dealMoreCards()
                         }
                 }
             }
-            AspectVGrid(items: Array(game.cards[0..<game.numberOfShowingCards]), aspectRatio: DrawingConstants.cardsAspectRatio, content: { card in
-                cardView(for: card)
-            })
+            .padding(.horizontal)
         }
     }
     
+    var matchedDeck: some View{
+        ZStack{
+            Color.clear.frame(width: DrawingConstants.deckWidth, height: DrawingConstants.deckHeight)
+            ForEach(game.cards.filter({$0.status == .matched})){ card in
+                Group{
+                    cardView(for: card)
+                        .matchedGeometryEffect(id: card.id, in: matchedNamespace)
+                }
+                .frame(width: DrawingConstants.deckWidth, height: DrawingConstants.deckHeight)
+            }
+            
+        }
+    }
+    
+    var deckBody: some View{
+        ZStack{
+            Color.clear.frame(width: DrawingConstants.deckWidth, height: DrawingConstants.deckHeight)
+            ForEach(Array(game.cards[game.numberOfShowingCards..<game.cards.count])){ card in
+                Group{
+                    cardView(for: card)
+                        .matchedGeometryEffect(id: card.id, in: matchedNamespace)
+                    RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+                        .foregroundColor(.red)
+                }
+                .frame(width: DrawingConstants.deckWidth, height: DrawingConstants.deckHeight)
+            }
+            
+        }
+    }
+    
+    var newGameButton: some View{
+        Text("New game")
+            .padding()
+            .foregroundColor(.blue)
+            .font(Font.body.weight(.bold))
+            .onTapGesture {
+                withAnimation{
+                    game.newGame()
+                }
+            }
+    }
+        
     @ViewBuilder
     private func cardView(for card: Model.Card) -> some View{
         CardView(card: card)
+            .animation(Animation.easeOut)
             .foregroundColor(game.chooseColor(card.color))
             .padding(DrawingConstants.paddingBetweenCards)
-            .onTapGesture {
-                game.chooseCard(card)
-            }
     }
     
     private struct DrawingConstants{
         static let paddingBetweenCards: CGFloat = 2
+        static let cornerRadius: CGFloat = 10
         static let cardsAspectRatio: CGFloat = 2/3
+        static let deckHeight: CGFloat = 90
+        static let deckWidth = deckHeight * cardsAspectRatio
     }
 }
 
 struct CardView: View{
     let card: Model.Card
     
+    var body: some View{
+        ZStack{
+            cardBackground
+            shapes
+        }
+    }
+    
+    private var cardBackground: some View{
+        ZStack{
+            RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius).fill().foregroundColor(.white)
+            switch card.status{
+                case .notMatched: RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius).fill().foregroundColor(.red).opacity(DrawingConstants.backgrougOpacity)
+                case .matched: RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius).fill().foregroundColor(.green).opacity(DrawingConstants.backgrougOpacity)
+                case .selected: RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius).fill().foregroundColor(.blue).opacity(DrawingConstants.backgrougOpacity)
+                case .idle: RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius).fill().foregroundColor(.gray).opacity(DrawingConstants.backgrougOpacity)
+            }
+        }
+    }
+    
     private var shapes: some View{
         VStack{
-            ForEach(0..<card.numberOfShapes) { _ in
+            ForEach(0..<card.numberOfShapes, id: \.self) { _ in
                 switch (card.shape){
                     case .diamond:
                         switch card.shading {
@@ -86,20 +147,8 @@ struct CardView: View{
                         }
                 }
             }
-        }.padding(DrawingConstants.shapesPadding)
-    }
-    
-    var body: some View{
-        ZStack{
-            let cardBackground = RoundedRectangle(cornerRadius: DrawingConstants.backgroundCornerRadius)
-            switch card.status{
-                case .notMatched: cardBackground.fill().foregroundColor(.red).opacity(DrawingConstants.backgrougOpacity)
-                case .matched: cardBackground.fill().foregroundColor(.green).opacity(DrawingConstants.backgrougOpacity)
-                case .selected: cardBackground.fill().foregroundColor(.blue).opacity(DrawingConstants.backgrougOpacity)
-                case .idle: cardBackground.fill().foregroundColor(.gray).opacity(DrawingConstants.backgrougOpacity)
-            }
-            shapes
         }
+            .padding(DrawingConstants.shapesPadding)
     }
     
     private struct DrawingConstants{

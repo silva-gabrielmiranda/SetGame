@@ -29,7 +29,7 @@ struct Model {
         var id: Int = 1
         for numberOfShapesIndex in Model.numberOfShapesOptions.indices {
             for shapeIndex in Model.shapeOptions.indices {
-                for shadingIndex in Model.shapeOptions.indices {
+                for shadingIndex in Model.shadingOptions.indices {
                     for colorIndex in Model.colorOptions.indices {
                         cards.append(
                             Card(
@@ -45,25 +45,13 @@ struct Model {
                 }
             }
         }
-        cards = cards.shuffled()
-//        numberOfShowingCards = 3
-//        cards.append(Card(numberOfShapes: 1, shape: Card.shape.squiggle, shading: Card.shading.solid, color: "red", id: 1))
-//        cards.append(Card(numberOfShapes: 2, shape: Card.shape.squiggle, shading: Card.shading.solid, color: "red", id: 2))
-//        cards.append(Card(numberOfShapes: 3, shape: Card.shape.squiggle, shading: Card.shading.solid, color: "red", id: 3))
+//        cards.shuffle()
     }
     
     mutating func clearMatchesAndNoMatches(){
         for index in cards.indices.reversed(){
             if(cards[index].status == .notMatched){
                 cards[index].status = .idle
-            }
-            if(cards[index].status == .matched){
-                if(numberOfShowingCards == cards.count){
-                    numberOfShowingCards -= 1
-                    cards.remove(at: index)
-                } else {
-                    cards[index] = cards.removeLast()
-                }
             }
         }
     }
