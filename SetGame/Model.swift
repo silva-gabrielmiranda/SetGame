@@ -45,7 +45,7 @@ struct Model {
                 }
             }
         }
-//        cards.shuffle()
+        cards.shuffle()
     }
     
     mutating func clearMatchesAndNoMatches(){
@@ -81,10 +81,8 @@ struct Model {
     
     mutating func dealMoreCards(){
         clearMatchesAndNoMatches()
-        if(numberOfShowingCards < cards.count - 3){
-            numberOfShowingCards += 3
-        } else {
-            numberOfShowingCards = cards.count
+        if(numberOfShowingCards < cards.count){
+            numberOfShowingCards += 1
         }
     }
     

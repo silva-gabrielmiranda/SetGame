@@ -33,13 +33,20 @@ struct ContentView: View {
                 Spacer()
                 deckBody
                     .onTapGesture {
-                        withAnimation{
-                            game.dealMoreCards()
+                        for index in 0..<3 {
+                            withAnimation(dealAnimation(delay: Double(index) / 10)){
+                                game.dealMoreCards()
+                            
+                            }
                         }
-                }
+                    }
             }
             .padding(.horizontal)
         }
+    }
+    
+    private func dealAnimation(delay: Double) -> Animation {
+        return Animation.easeOut.delay(delay);
     }
     
     var matchedDeck: some View{
@@ -87,7 +94,6 @@ struct ContentView: View {
     @ViewBuilder
     private func cardView(for card: Model.Card) -> some View{
         CardView(card: card)
-            .animation(Animation.easeOut)
             .foregroundColor(game.chooseColor(card.color))
             .padding(DrawingConstants.paddingBetweenCards)
     }
@@ -126,7 +132,7 @@ struct CardView: View{
     private var shapes: some View{
         VStack{
             ForEach(0..<card.numberOfShapes, id: \.self) { _ in
-                switch (card.shape){
+                switch card.shape{
                     case .diamond:
                         switch card.shading {
                             case .open: Diamond().stroke(lineWidth: DrawingConstants.lineWidth)
